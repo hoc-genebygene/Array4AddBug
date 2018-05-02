@@ -10,9 +10,13 @@ void array4_add_inplace(ArrayType & a, ArrayType b) {
 }
 
 int main() {
-    ArrayType a {1,2,3,4};
-    ArrayType b {5,6,7,8};
+    ArrayType a {4,0,0,0};
+    ArrayType b {4,0,0,0};
+    ArrayType c {4,0,0,0};
+    ArrayType d {3,1,0,0};
 
+    array4_add_inplace(a, c);
+    array4_add_inplace(b, d);
     array4_add_inplace(a, b);
 
     std::cout << a[0] << " " << a[1] << " " << a[2] << " " << a[3] << std::endl;
