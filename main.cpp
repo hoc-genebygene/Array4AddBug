@@ -14,6 +14,13 @@ inline void array4_add_inplace(std::array<Type1, 4> & a, std::array<Type2, 4> b)
 //    a[3] += a[3];
 }
 
+using ArrayType = std::array<uint8_t, 4>;
+
+static ArrayType static_a{3,1,0,0};
+static ArrayType static_b{4,0,0,0};
+static ArrayType static_c{4,0,0,0};
+static ArrayType static_d{4,0,0,0};
+
 struct Reference {
     static std::array<std::array<uint8_t, 4>,256> countLookup;
 
@@ -23,11 +30,10 @@ struct Reference {
 //        const std::array<uint8_t, 4> & c = countLookup[(region >> 2*8) & 255];
 //        const std::array<uint8_t, 4> & d = countLookup[region >> 3*8];
 
-        using ArrayType = std::array<uint8_t, 4>;
-        ArrayType a{3,1,0,0};
-        ArrayType b{4,0,0,0};
-        ArrayType c{4,0,0,0};
-        ArrayType d{4,0,0,0};
+        ArrayType a = static_a;
+        ArrayType b = static_b;
+        const ArrayType & c = static_c;
+        const ArrayType & d = static_d;
 
         array4_add_inplace(a, c);
         array4_add_inplace(b, d);
