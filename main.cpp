@@ -18,10 +18,16 @@ struct Reference {
     static std::array<std::array<uint8_t, 4>,256> countLookup;
 
     static std::array<uint8_t, 4> getOccCountOfRegion(uint32_t region) {
-        std::array<uint8_t, 4> a = countLookup[region & 255];
-        std::array<uint8_t, 4> b = countLookup[(region >> 8) & 255];
-        const std::array<uint8_t, 4> & c = countLookup[(region >> 2*8) & 255];
-        const std::array<uint8_t, 4> & d = countLookup[region >> 3*8];
+//        std::array<uint8_t, 4> a = countLookup[region & 255];
+//        std::array<uint8_t, 4> b = countLookup[(region >> 8) & 255];
+//        const std::array<uint8_t, 4> & c = countLookup[(region >> 2*8) & 255];
+//        const std::array<uint8_t, 4> & d = countLookup[region >> 3*8];
+
+        using ArrayType = std::array<uint8_t, 4>;
+        ArrayType a{3,1,0,0};
+        ArrayType b{4,0,0,0};
+        ArrayType c{4,0,0,0};
+        ArrayType d{4,0,0,0};
 
         array4_add_inplace(a, c);
         array4_add_inplace(b, d);
