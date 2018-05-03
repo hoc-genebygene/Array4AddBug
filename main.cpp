@@ -1,10 +1,12 @@
 #include <array>
 #include <iostream>
 
-struct Reference {
-    static const constexpr int COUNT_LOOKUP_SIZE = 256;
-    static std::array<std::array<uint8_t, 4>,COUNT_LOOKUP_SIZE> countLookup;
-};
+template <class Type1, class Type2>
+inline void array4_add_inplace(std::array<Type1, 4> & a, std::array<Type2, 4> b) {
+    for(int i = 0; i < 4; i++) {
+        a[i] += b[i];
+    }
+}
 
 template <int n>
 static constexpr int pow2_constexpr() {
@@ -28,6 +30,27 @@ static constexpr int log2_ceil_constexpr() {
 }
 
 static const constexpr int NUMBER_OF_BASES = 4;
+
+struct Reference {
+    static const constexpr int COUNT_LOOKUP_SIZE = 256;
+    static std::array<std::array<uint8_t, 4>,COUNT_LOOKUP_SIZE> countLookup;
+
+    static const constexpr int NUMBER_OF_BITS_PER_BASE_COUNT_U32 = 32 / NUMBER_OF_BASES;
+    static const constexpr int NUMBER_OF_BITS_PER_BASE_COUNT_U32_MASK = pow2_constexpr<NUMBER_OF_BITS_PER_BASE_COUNT_U32>() - 1;
+
+    static std::array<uint8_t, 4> getOccCountOfRegion(uint32_t region) {
+        std::array<uint8_t, 4> a = countLookup[region & NUMBER_OF_BITS_PER_BASE_COUNT_U32_MASK];
+        std::array<uint8_t, 4> b = countLookup[(region >> NUMBER_OF_BITS_PER_BASE_COUNT_U32) & NUMBER_OF_BITS_PER_BASE_COUNT_U32_MASK];
+        const std::array<uint8_t, 4> & c = countLookup[(region >> 2*NUMBER_OF_BITS_PER_BASE_COUNT_U32) & NUMBER_OF_BITS_PER_BASE_COUNT_U32_MASK];
+        const std::array<uint8_t, 4> & d = countLookup[region >> 3*NUMBER_OF_BITS_PER_BASE_COUNT_U32];
+
+        array4_add_inplace(a, c);
+        array4_add_inplace(b, d);
+        array4_add_inplace(a, b);
+        return a;
+    }
+};
+
 const constexpr int NUMBER_OF_BITS_PER_BASE = log2_ceil_constexpr<NUMBER_OF_BASES>();
 const constexpr int BASE_MASK = pow2_constexpr<NUMBER_OF_BITS_PER_BASE>() - 1;
 
@@ -54,23 +77,8 @@ std::array<std::array<uint8_t, 4>,Reference::COUNT_LOOKUP_SIZE> makeCountLookupA
 
 std::array<std::array<uint8_t, 4>,Reference::COUNT_LOOKUP_SIZE> Reference::countLookup = makeCountLookupArray();
 
-using ArrayType = std::array<uint64_t, 4>;
-
-void array4_add_inplace(ArrayType & a, ArrayType b) {
-    for(int i = 0; i < 4; i++) {
-        a[i] += b[i];
-    }
-}
-
 int main() {
-    ArrayType a {4,0,0,0};
-    ArrayType b {4,0,0,0};
-    ArrayType c {4,0,0,0};
-    ArrayType d {3,1,0,0};
+    auto occ_count = Reference::getOccCountOfRegion(1);
 
-    array4_add_inplace(a, c);
-    array4_add_inplace(b, d);
-    array4_add_inplace(a, b);
-
-    std::cout << a[0] << " " << a[1] << " " << a[2] << " " << a[3] << std::endl;
+    std::cout << (int)occ_count[0] << " " << (int)occ_count[1] << " " << (int)occ_count[2] << " " << (int)occ_count[3] << std::endl;
 }
